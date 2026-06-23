@@ -10,7 +10,11 @@ if(MINGW OR CYGWIN)
     add_definitions(-O3)
 endif()
 
-include_directories(./include ./src)
+include_directories(
+        ./include
+        ./src
+        ./third_party/eigen-5.0.0
+)
 file(GLOB_RECURSE source_files CONFIGURE_DEPENDS
         src/*.cpp
         src/*.cc
@@ -26,4 +30,3 @@ if(UNIX AND NOT APPLE)
 endif()
 
 add_subdirectory(autograder)
-

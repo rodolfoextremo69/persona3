@@ -181,6 +181,11 @@ public:
         return {};
     }
 
+
+    std::unordered_map<std::string, Tensor<float>> gradients() const override {
+        return {};
+    }
+
     std::unique_ptr<Layer> clone() const override {
         return std::make_unique<MaxPooling2D>(*this);
     }

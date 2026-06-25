@@ -1,4 +1,3 @@
-
 #ifndef PROG3_PF_EPIC1_FEATURE2_V2026_1_UTEC_ALGEBRA_TENSOR_OPS_H
 #define PROG3_PF_EPIC1_FEATURE2_V2026_1_UTEC_ALGEBRA_TENSOR_OPS_H
 
@@ -111,7 +110,7 @@ Tensor<T> flatten_batch(const Tensor<T>& x) {
     const int batch = x.shape()[0];
     const int features = static_cast<int>(x.numel() / batch);
 
-    return x.reshape(Shape{batch, features});
+    return x.reshaped(Shape{batch, features});
 }
 
 template <typename T>

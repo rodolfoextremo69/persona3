@@ -29,6 +29,7 @@ private:
     optimizers::SGD optimizer_{0.01f};
     losses::CategoricalCrossentropy loss_{};
     Shape input_shape_;
+    std::unordered_map<std::string, Tensor<float>> last_gradients_;
 
 public:
     Sequential() = default;
@@ -120,6 +121,55 @@ public:
         }
 
         return result;
+    }
+
+    std::unordered_map<std::string, Tensor<float>> last_gradients() const {
+        return last_gradients_;
+    }
+
+    void backward(const Tensor<float>& loss_gradient) {
+        Tensor<float> grad = loss_gradient;
+
+        for (auto it = layers_.rbegin(); it != layers_.rend(); ++it) {
+            grad = (*it)->backward(grad);
+        }
+
+        last_gradients_.clear();
+        int dense_count = 0;
+        int conv_count = 0;
+
+        for (auto& layer : layers_) {
+            auto grads = layer->gradients();
+            auto params = layer->parameters();
+
+            if (grads.empty()) {
+                continue;
+            }
+
+            std::string prefix;
+
+            if (layer->layer_type() == "dense") {
+                prefix = "dense_" + std::to_string(dense_count++);
+            } else if (layer->layer_type() == "conv2d") {
+                prefix = "conv2d_" + std::to_string(conv_count++);
+            } else {
+                continue;
+            }
+
+            for (const auto& item : grads) {
+                last_gradients_[prefix + "/" + item.first] = item.second;
+            }
+
+            for (const auto& item : params) {
+                std::string key = item.first;
+                Tensor<float> param_tensor = item.second;
+                Tensor<float> grad_tensor = grads[key];
+
+                for (size_t i = 0; i < param_tensor.numel(); ++i) {
+                    param_tensor[i] -= optimizer_.learning_rate * grad_tensor[i];
+                }
+            }
+        }
     }
 };
 

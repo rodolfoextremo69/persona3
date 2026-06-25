@@ -96,6 +96,13 @@ public:
         };
     }
 
+    std::unordered_map<std::string, Tensor<float>> gradients() const override {
+        return {
+            {"weights", grad_weights_},
+            {"bias", grad_bias_}
+        };
+    }
+
     // persona1
     Tensor<float> backward(const Tensor<float>& grad_output) override {
         Tensor<float> dZ = grad_output;

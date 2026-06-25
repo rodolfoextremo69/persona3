@@ -27,6 +27,10 @@ namespace utec::tf {
             return {};
         }
 
+        virtual std::unordered_map<std::string, Tensor<float>> gradients() const {
+            return {};
+        }
+
         virtual std::unique_ptr<Layer> clone() const = 0;
 
         virtual std::string layer_type() const {
